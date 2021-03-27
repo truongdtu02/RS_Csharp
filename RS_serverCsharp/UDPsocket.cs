@@ -160,9 +160,9 @@ namespace RS_serverCsharp
                         {
                             socket.SendTo(sendBuffer, sendBuffer.Length, socketFlag, clientList[i].IPEndPoint_client);
                             numOfFrame++;
-                            tmp_byte = BitConverter.GetBytes(numOfFrame);
-                            Buffer.BlockCopy(tmp_byte, 0, oridata, 0, 4);
-                            rs.encode(oridata, sendBuffer);
+                            //tmp_byte = BitConverter.GetBytes(numOfFrame);
+                            //Buffer.BlockCopy(tmp_byte, 0, oridata, 0, 4);
+                            //rs.encode(oridata, sendBuffer);
                         }
                         catch (Exception ex)
                         {

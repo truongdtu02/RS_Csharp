@@ -12,8 +12,8 @@ namespace RSCsharpClient
     class UDPsocketClient
     {
         // chuyển đổi chuỗi ký tự thành object thuộc kiểu IPAddress
-        static IPAddress serverIp = IPAddress.Parse("45.118.145.137");
-        //static IPAddress serverIp = IPAddress.Parse("127.0.0.1"); //local host
+        //static IPAddress serverIp = IPAddress.Parse("45.118.145.137");
+        static IPAddress serverIp = IPAddress.Parse("127.0.0.1"); //local host
         // chuyển chuỗi ký tự thành biến kiểu int
         static int serverPort = int.Parse("1308");
 
@@ -75,18 +75,58 @@ namespace RSCsharpClient
             }
         }
 
+        //check bit diff
+        int checkBitDiff(byte[] a, byte[] b, int leng) {
+            int errorbits = 0, i, j;
+            for (i = 0; i < leng; i++)
+            {
+                int diff = a[i] ^ b[i];
+                for (j = 0; j < 8; j++)
+                {
+                    if ((diff & 1) == 1)
+                        errorbits++;
+                    diff = diff >> 1;
+                }
+            }
+            return errorbits;
+        }
+
         void receive()
         {
             EndPoint dummyEndpoint = new IPEndPoint(IPAddress.Any, 0);
             ReedSolomon rs = new ReedSolomon();
+
+            //check error bits
+            int encodelength = 1472; //Byteencodelength
+            byte[] _encode = new byte[encodelength];
+
+            {
+                int dataleng = rs.GetDataLeng(encodelength);
+                int[] dataInt = new int[dataleng / 4];
+                //initialize
+                for (int i = 0; i < dataInt.Length; i++)
+                {
+                    dataInt[i] = i;
+                }
+
+                byte[] datarand = new byte[dataInt.Length * sizeof(int)];
+                Buffer.BlockCopy(dataInt, 0, datarand, 0, datarand.Length);
+                rs.encode(datarand, _encode);
+            }
+            
             int Frame = 0, error = 0, lost = 0;
+            int maxError = 0, minError = 100000;
 
             while (true)
             {
                 try
                 {
                     int length = socket.ReceiveFrom(receiveBuffer, ref dummyEndpoint);
-                    //Frame++;
+                    Frame++;
+                    int res = checkBitDiff(_encode, receiveBuffer, length);
+                    maxError = (res > maxError) ? res : maxError;
+                    minError = (res < minError) ? res : minError;
+
                     int decodedataleng = rs.GetDataLeng(length);
                     byte[] decodedata = new byte[decodedataleng];
                     int sign = rs.decode(receiveBuffer, length, decodedata);
@@ -103,20 +143,19 @@ namespace RSCsharpClient
                             }
                         }
                         //check order
-                        int order = BitConverter.ToInt32(decodedata, 0);
-                        if(order > Frame) {
-                            lost += order - Frame - 1;
-                            Frame = order;
-                        }
+                        //int order = BitConverter.ToInt32(decodedata, 0);
+                        //if(order > Frame) {
+                        //    lost += order - Frame - 1;
+                        //    Frame = order;
+                        //}
                     }
-                    
                 }
                 catch (Exception ex)
                 {
                     //Console.WriteLine(ex);
                 }
-                if ((Frame % 60 == 0) && (Frame > 0))
-                    Console.WriteLine("Frame {0} . Error: {1} . Lost: {2}", Frame, error, lost);
+                if ((Frame % 100 == 0) && (Frame > 0))
+                    Console.WriteLine("Frame {0} . Error: {1} . Error bit: Max {2}, Min: {3}", Frame, error, maxError, minError);
             }
         }
 

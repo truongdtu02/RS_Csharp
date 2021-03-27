@@ -10,7 +10,7 @@ namespace RS_serverCsharp
         static void Main(string[] args)
         {
             ReedSolomon _rs = new ReedSolomon(); //initialize parity bytes
-            int encodelength = 800; //Byteencodelength
+            int encodelength = 1472; //Byteencodelength
             int dataleng = _rs.GetDataLeng(encodelength);
             int[] dataInt = new int[dataleng / 4];
             //initialize
