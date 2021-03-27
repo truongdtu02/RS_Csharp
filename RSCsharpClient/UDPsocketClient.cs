@@ -115,7 +115,7 @@ namespace RSCsharpClient
                 {
                     //Console.WriteLine(ex);
                 }
-                if ((Frame % 30 == 0) && (Frame > 0))
+                if ((Frame % 60 == 0) && (Frame > 0))
                     Console.WriteLine("Frame {0} . Error: {1} . Lost: {2}", Frame, error, lost);
             }
         }
