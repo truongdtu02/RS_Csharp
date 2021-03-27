@@ -23,7 +23,7 @@ namespace RS_serverCsharp
 
             byte[] encode = new byte[encodelength];
 
-            _rs.encode(data, encode);
+            //_rs.encode(data, encode);
 
             ////add error
             //Random _random = new Random();
@@ -48,7 +48,7 @@ namespace RS_serverCsharp
                  new client_IPEndPoint(){ ID_client = "20154023", On = true, NumSend = 1},
                  new client_IPEndPoint(){ ID_client = "00000001", On = true}
             };
-            UDPsocket udpsocket = new UDPsocket(clientList, encode);
+            UDPsocket udpsocket = new UDPsocket(clientList, encode, data);
             udpsocket.UDPsocketSend();
             //Console.WriteLine("Hello World!");
         }

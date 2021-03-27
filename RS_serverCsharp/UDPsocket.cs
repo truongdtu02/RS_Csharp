@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Linq;
 using System.IO;
+using FEC;
 
 namespace RS_serverCsharp
 {
@@ -32,11 +33,15 @@ namespace RS_serverCsharp
         const int Max_send_buff_length = 1472;//1472; //534
 
         byte[] sendBuffer;
+        byte[] oridata;
 
-        public UDPsocket(List<client_IPEndPoint> _clientList, byte[] _senddata)
+        ReedSolomon rs = new ReedSolomon(); //initialize parity bytes
+
+        public UDPsocket(List<client_IPEndPoint> _clientList, byte[] _senddata, byte[] _oridata)
         {
             clientList = _clientList;
             if (_senddata.Length <= Max_send_buff_length) sendBuffer = _senddata;
+            oridata = _oridata;
 
             try
             {
@@ -142,7 +147,9 @@ namespace RS_serverCsharp
         {
             SocketFlags socketFlag = new SocketFlags();
             int numOfFrame = 0;
+            byte[] tmp_byte = new byte[4];
 
+            rs.encode(oridata, sendBuffer);
             while (true)
             {
                 for (int i = 0; i < clientList.Count; i++)
@@ -153,6 +160,9 @@ namespace RS_serverCsharp
                         {
                             socket.SendTo(sendBuffer, sendBuffer.Length, socketFlag, clientList[i].IPEndPoint_client);
                             numOfFrame++;
+                            tmp_byte = BitConverter.GetBytes(numOfFrame);
+                            Buffer.BlockCopy(tmp_byte, 0, oridata, 0, 4);
+                            rs.encode(oridata, sendBuffer);
                         }
                         catch (Exception ex)
                         {
