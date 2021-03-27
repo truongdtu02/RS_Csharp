@@ -171,9 +171,9 @@ namespace RS_serverCsharp
                     }
                 }
                 
-                if ((numOfFrame % 30 == 0) && (numOfFrame > 0))
+                if ((numOfFrame % 60 == 0) && (numOfFrame > 0))
                         Console.WriteLine("Frame: {0}", numOfFrame); //every 2.7s
-                Thread.Sleep(90); //90 ms
+                Thread.Sleep(40); //90 ms
             }          
         }
 
