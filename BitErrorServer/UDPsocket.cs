@@ -160,9 +160,9 @@ namespace RS_serverCsharp
                         {
                             socket.SendTo(sendBuffer, sendBuffer.Length, socketFlag, clientList[i].IPEndPoint_client);
                             numOfFrame++;
-                            tmp_byte = BitConverter.GetBytes(numOfFrame);
-                            Buffer.BlockCopy(tmp_byte, 0, oridata, 0, 4);
-                            rs.encode(oridata, sendBuffer);
+                            //tmp_byte = BitConverter.GetBytes(numOfFrame);
+                            //Buffer.BlockCopy(tmp_byte, 0, oridata, 0, 4);
+                            //rs.encode(oridata, sendBuffer);
                         }
                         catch (Exception ex)
                         {
@@ -171,9 +171,9 @@ namespace RS_serverCsharp
                     }
                 }
                 
-                if ((numOfFrame % 50 == 0) && (numOfFrame > 0))
+                if ((numOfFrame % 100 == 0) && (numOfFrame > 0))
                         Console.WriteLine("Frame: {0}", numOfFrame); //every 2.7s
-                Thread.Sleep(60); //90 ms
+                Thread.Sleep(30); //90 ms
             }          
         }
 

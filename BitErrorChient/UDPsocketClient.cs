@@ -12,8 +12,8 @@ namespace RSCsharpClient
     class UDPsocketClient
     {
         // chuyển đổi chuỗi ký tự thành object thuộc kiểu IPAddress
-        //static IPAddress serverIp = IPAddress.Parse("45.118.145.137");
-        static IPAddress serverIp = IPAddress.Parse("127.0.0.1"); //local host
+        static IPAddress serverIp = IPAddress.Parse("45.118.145.137");
+        //static IPAddress serverIp = IPAddress.Parse("127.0.0.1"); //local host
         // chuyển chuỗi ký tự thành biến kiểu int
         static int serverPort = int.Parse("1308");
 
@@ -122,7 +122,7 @@ namespace RSCsharpClient
                 try
                 {
                     int length = socket.ReceiveFrom(receiveBuffer, ref dummyEndpoint);
-                    //Frame++;
+                    Frame++;
                     int res = checkBitDiff(_encode, receiveBuffer, length);
                     maxError = (res > maxError) ? res : maxError;
                     minError = (res < minError) ? res : minError;
@@ -136,29 +136,26 @@ namespace RSCsharpClient
                         int[] data = new int[decodedata.Length / 4];
                         Buffer.BlockCopy(decodedata, 0, data, 0, decodedata.Length);
                         //check equal
-                        //for(int i = 1; i < data.Length; i++) { 
-                        //    if(data[i] != i) {
-                        //        error++;
-                        //        break;
-                        //    }
-                        //}
-                        //check order
-                        int order = BitConverter.ToInt32(decodedata, 0);
-                        if (order > Frame)
-                        {
-                            lost += order - Frame - 1;
-                            Frame = order;
+                        for(int i = 1; i < data.Length; i++) { 
+                            if(data[i] != i) {
+                                error++;
+                                break;
+                            }
                         }
+                        //check order
+                        //int order = BitConverter.ToInt32(decodedata, 0);
+                        //if(order > Frame) {
+                        //    lost += order - Frame - 1;
+                        //    Frame = order;
+                        //}
                     }
                 }
                 catch (Exception ex)
                 {
                     //Console.WriteLine(ex);
                 }
-                if ((Frame % 50 == 0) && (Frame > 0))
-                    //Console.WriteLine("Frame {0} . Error: {1} . Error bit: Max {2}, Min: {3}", Frame, error, maxError, minError);
-                    Console.WriteLine("Frame {0} . Lost: {1} ", Frame, lost);
-
+                if ((Frame % 100 == 0) && (Frame > 0))
+                    Console.WriteLine("Frame {0} . Error: {1} . Error bit: Max {2}, Min: {3}", Frame, error, maxError, minError);
             }
         }
 
